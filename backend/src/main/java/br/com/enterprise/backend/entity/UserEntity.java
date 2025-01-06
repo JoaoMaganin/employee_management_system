@@ -1,6 +1,10 @@
 package br.com.enterprise.backend.entity;
 
+import br.com.enterprise.backend.dto.UserDTO;
 import jakarta.persistence.*;
+import org.springframework.beans.BeanUtils;
+
+import java.util.Objects;
 
 @Entity
 @Table(name = "ETP_USUARIO")
@@ -21,6 +25,14 @@ public class UserEntity {
 
     @Column(nullable = false)
     private String email;
+
+    public UserEntity(UserDTO user) {
+        BeanUtils.copyProperties(user, this);
+    }
+
+    public UserEntity() {
+
+    }
 
     public Long getId() {
         return Id;
@@ -60,5 +72,17 @@ public class UserEntity {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        UserEntity that = (UserEntity) o;
+        return Objects.equals(Id, that.Id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(Id);
     }
 }
