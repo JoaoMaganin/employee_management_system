@@ -6,7 +6,7 @@ import org.springframework.beans.BeanUtils;
 public class UserDTO {
 
     private Long Id;
-    private String nome;
+    private String name;
     private String login;
     private String senha;
     private String email;
@@ -43,12 +43,12 @@ public class UserDTO {
         this.login = login;
     }
 
-    public String getNome() {
-        return nome;
+    public String getName() {
+        return name;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Long getId() {

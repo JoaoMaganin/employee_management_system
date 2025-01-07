@@ -7,7 +7,8 @@ import org.springframework.beans.BeanUtils;
 import java.util.Objects;
 
 @Entity
-@Table(name = "ETP_USUARIO")
+
+@Table(name = "ETP_USER")
 public class UserEntity {
 
     @Id
@@ -15,7 +16,7 @@ public class UserEntity {
     private Long Id;
 
     @Column(nullable = false)
-    private String nome;
+    private String name;
 
     @Column(nullable = false, unique = true)
     private String login;
@@ -42,12 +43,12 @@ public class UserEntity {
         Id = id;
     }
 
-    public String getNome() {
-        return nome;
+    public String getName() {
+        return name;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getLogin() {
