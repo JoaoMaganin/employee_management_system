@@ -22,7 +22,7 @@ public class UserEntity {
     private String login;
 
     @Column(nullable = false)
-    private String senha;
+    private String password;
 
     @Column(nullable = false)
     private String email;
@@ -59,12 +59,12 @@ public class UserEntity {
         this.login = login;
     }
 
-    public String getSenha() {
-        return senha;
+    public String getPassword() {
+        return password;
     }
 
-    public void setSenha(String senha) {
-        this.senha = senha;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getEmail() {

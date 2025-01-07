@@ -8,7 +8,7 @@ public class UserDTO {
     private Long Id;
     private String name;
     private String login;
-    private String senha;
+    private String password;
     private String email;
 
     public UserDTO(UserEntity user) {
@@ -27,12 +27,12 @@ public class UserDTO {
         this.email = email;
     }
 
-    public String getSenha() {
-        return senha;
+    public String getPassword() {
+        return password;
     }
 
-    public void setSenha(String senha) {
-        this.senha = senha;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getLogin() {
