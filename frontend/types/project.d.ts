@@ -1,4 +1,4 @@
-declare namespace Projeto {
+declare namespace Project {
 
     type User = {
         id?: number;

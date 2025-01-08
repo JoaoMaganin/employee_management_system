@@ -14,8 +14,8 @@ import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState } from 'react';
-import { ProductService } from '../../../../demo/service/ProductService';
 import { Project } from '@/types';
+import { axiosInstance, UserService } from '@/service/UserService';
 
 /* @todo Used 'as any' for types here. Will fix in next version due to onSelectionChange event type issue. */
 const Crud = () => {
@@ -23,7 +23,8 @@ const Crud = () => {
         id: 0,
         name: '',
         password: '',
-        email: ''
+        email: '',
+        login: ''
     };
 
     const [users, setUsers] = useState(null);
@@ -36,9 +37,19 @@ const Crud = () => {
     const [globalFilter, setGlobalFilter] = useState('');
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<any>>(null);
+    const userService = new UserService();
 
     useEffect(() => {
         //ProductService.getProducts().then((data) => setProducts(data as any));
+        userService.listAll()
+            .then((response) => {
+                console.log(response.data);
+                setUsers(response.data);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+        
     }, []);
 
     const openNew = () => {
@@ -63,6 +74,7 @@ const Crud = () => {
     const saveUser = () => {
         setSubmitted(true);
 
+        
         // if (product.name.trim()) {
         //     let _products = [...(products as any)];
         //     let _product = { ...product };
