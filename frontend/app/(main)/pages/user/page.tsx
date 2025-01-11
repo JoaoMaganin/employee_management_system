@@ -27,7 +27,7 @@ const Crud = () => {
         login: ''
     };
 
-    const [users, setUsers] = useState(null);
+    const [users, setUsers] = useState<Project.User[]>([]);
     const [userDialog, setUserDialog] = useState(false);
     const [deleteUserDialog, setDeleteUserDialog] = useState(false);
     const [deleteUsersDialog, setDeleteUsersDialog] = useState(false);
@@ -40,17 +40,19 @@ const Crud = () => {
     const userService = new UserService();
 
     useEffect(() => {
-        //ProductService.getProducts().then((data) => setProducts(data as any));
-        userService.listAll()
-            .then((response) => {
-                console.log(response.data);
-                setUsers(response.data);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-        
-    }, []);
+        console.log(users);
+        if(users.length == 0) {
+            userService.listAll()
+                .then((response) => {
+                    console.log(response.data);
+                    setUsers(response.data);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        }
+
+    }, [users]);
 
     const openNew = () => {
         setUser(emptyUser);
@@ -74,36 +76,48 @@ const Crud = () => {
     const saveUser = () => {
         setSubmitted(true);
 
-        
-        // if (product.name.trim()) {
-        //     let _products = [...(products as any)];
-        //     let _product = { ...product };
-        //     if (product.id) {
-        //         const index = findIndexById(product.id);
-
-        //         _products[index] = _product;
-        //         toast.current?.show({
-        //             severity: 'success',
-        //             summary: 'Successful',
-        //             detail: 'Product Updated',
-        //             life: 3000
-        //         });
-        //     } else {
-        //         _product.id = createId();
-        //         _product.image = 'product-placeholder.svg';
-        //         _products.push(_product);
-        //         toast.current?.show({
-        //             severity: 'success',
-        //             summary: 'Successful',
-        //             detail: 'Product Created',
-        //             life: 3000
-        //         });
-        //     }
-
-        //     setProducts(_products as any);
-        //     setProductDialog(false);
-        //     setProduct(emptyProduct);
-        // }
+        if (!user.id) {
+            userService.create(user)
+                .then((response) => {
+                    setUserDialog(false);
+                    setUser(emptyUser);
+                    setUsers([]);
+                    toast.current.show({
+                        severity: 'info',
+                        summary: 'Success',
+                        detail: 'User registered successfull'
+                    });
+                })
+                .catch((error) => {
+                    console.log(error);
+                    toast.current.show({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: error
+                    });
+                })
+        } else {
+            console.log("Chamando update com o usuário:", user);
+            userService.update(user)
+                .then((response) => {
+                    setUserDialog(false);
+                    setUser(emptyUser);
+                    setUsers([]);
+                    toast.current.show({
+                        severity: 'info',
+                        summary: 'Success',
+                        detail: 'User changed successfull'
+                    });
+                })
+                .catch((error) => {
+                    console.log(error);
+                    toast.current.show({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Change error: ' + error.message
+                    });
+                })
+        }
     };
 
     const editUser = (user: Project.User) => {
@@ -117,16 +131,25 @@ const Crud = () => {
     };
 
     const deleteUser = () => {
-        // let _products = (products as any)?.filter((val: any) => val.id !== product.id);
-        // setProducts(_products);
-        // setDeleteProductDialog(false);
-        // setProduct(emptyProduct);
-        // toast.current?.show({
-        //     severity: 'success',
-        //     summary: 'Successful',
-        //     detail: 'Product Deleted',
-        //     life: 3000
-        // });
+        userService.delete(user.id)
+            .then((response) => {
+                setUser(emptyUser);
+                setDeleteUserDialog(false);
+                setUsers([]);
+                toast.current?.show({
+                    severity: 'success',
+                    summary: 'Successful!',
+                    detail: 'User Deleted',
+                    life: 3000
+                });
+            }).catch((error) => {
+                toast.current?.show({
+                    severity: 'error',
+                    summary: 'Error!',
+                    detail: 'Error to delete user',
+                    life: 3000
+                });
+            })
     };
 
     // const findIndexById = (id: string) => {
