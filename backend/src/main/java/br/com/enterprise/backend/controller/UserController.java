@@ -28,7 +28,6 @@ public class UserController {
 
     @PutMapping
     public UserDTO update(@RequestBody UserDTO user) {
-        System.out.println("Atualizando usuário: " + user);
         return userService.update(user);
     }
 
