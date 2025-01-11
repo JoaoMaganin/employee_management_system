@@ -24,9 +24,22 @@ public class UserService {
         userRepository.save(userEntity);
     }
 
-    public UserDTO update(UserDTO user) {
+    /*public UserDTO update(UserDTO user) {
         UserEntity userEntity = new UserEntity(user);
         return new UserDTO(userRepository.save(userEntity));
+    }*/
+
+    public UserDTO update(UserDTO userDTO) {
+        // Verify if user id is empty
+        UserEntity existingUser = userRepository.findById(userDTO.getId())
+                .orElseThrow(() -> new RuntimeException("User not found")); // Lança exceção se não encontrar o usuário
+
+        existingUser.setName(userDTO.getName());
+        existingUser.setEmail(userDTO.getEmail());
+
+        UserEntity updatedUser = userRepository.save(existingUser);
+
+        return new UserDTO(updatedUser);
     }
 
     public void delete(Long id) {
