@@ -35,24 +35,25 @@ const Crud = () => {
     const [selectedUsers, setSelectedUsers] = useState(null);
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState('');
+    const [userLoaded, setUserLoaded] = useState(false);
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<any>>(null);
     const userService = new UserService();
 
     useEffect(() => {
-        console.log(users);
-        if(users.length == 0) {
+        if(!userLoaded && users.length == 0) {
             userService.listAll()
                 .then((response) => {
                     console.log(response.data);
                     setUsers(response.data);
+                    setUserLoaded(true);
                 })
                 .catch((error) => {
                     console.log(error);
                 });
         }
 
-    }, [users]);
+    }, [user]);
 
     const openNew = () => {
         setUser(emptyUser);
@@ -80,8 +81,9 @@ const Crud = () => {
             userService.create(user)
                 .then((response) => {
                     setUserDialog(false);
+                    setUserLoaded(false);
                     setUser(emptyUser);
-                    setUsers([]);
+                    //setUsers([]);
                     toast.current.show({
                         severity: 'info',
                         summary: 'Success',
@@ -102,7 +104,7 @@ const Crud = () => {
                 .then((response) => {
                     setUserDialog(false);
                     setUser(emptyUser);
-                    setUsers([]);
+                    //setUsers([]);
                     toast.current.show({
                         severity: 'info',
                         summary: 'Success',
@@ -135,6 +137,7 @@ const Crud = () => {
             .then((response) => {
                 setUser(emptyUser);
                 setDeleteUserDialog(false);
+                setUserLoaded(false);
                 setUsers([]);
                 toast.current?.show({
                     severity: 'success',
