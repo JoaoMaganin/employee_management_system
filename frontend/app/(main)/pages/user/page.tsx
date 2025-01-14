@@ -5,17 +5,13 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
 import { FileUpload } from 'primereact/fileupload';
-import { InputNumber, InputNumberValueChangeEvent } from 'primereact/inputnumber';
 import { InputText } from 'primereact/inputtext';
-import { InputTextarea } from 'primereact/inputtextarea';
-import { RadioButton, RadioButtonChangeEvent } from 'primereact/radiobutton';
-import { Rating } from 'primereact/rating';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState } from 'react';
 import { Project } from '@/types';
-import { axiosInstance, UserService } from '@/service/UserService';
+import { UserService } from '@/service/UserService';
 
 /* @todo Used 'as any' for types here. Will fix in next version due to onSelectionChange event type issue. */
 const Crud = () => {
@@ -32,7 +28,7 @@ const Crud = () => {
     const [deleteUserDialog, setDeleteUserDialog] = useState(false);
     const [deleteUsersDialog, setDeleteUsersDialog] = useState(false);
     const [user, setUser] = useState<Project.User>(emptyUser);
-    const [selectedUsers, setSelectedUsers] = useState(null);
+    const [selectedUsers, setSelectedUsers] = useState<Project.User[]>([]);
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState('');
     const [userLoaded, setUserLoaded] = useState(false);
@@ -41,7 +37,7 @@ const Crud = () => {
     const userService = new UserService();
 
     useEffect(() => {
-        if(!userLoaded && users.length == 0) {
+        if (!userLoaded && users.length == 0) {
             userService.listAll()
                 .then((response) => {
                     console.log(response.data);
@@ -53,7 +49,7 @@ const Crud = () => {
                 });
         }
 
-    }, [user]);
+    }, [userService, users]);
 
     const openNew = () => {
         setUser(emptyUser);
@@ -83,8 +79,8 @@ const Crud = () => {
                     setUserDialog(false);
                     setUserLoaded(false);
                     setUser(emptyUser);
-                    //setUsers([]);
-                    toast.current.show({
+                    setUsers([]);
+                    toast.current?.show({
                         severity: 'info',
                         summary: 'Success',
                         detail: 'User registered successfull'
@@ -92,7 +88,7 @@ const Crud = () => {
                 })
                 .catch((error) => {
                     console.log(error);
-                    toast.current.show({
+                    toast.current?.show({
                         severity: 'error',
                         summary: 'Error',
                         detail: error
@@ -103,9 +99,10 @@ const Crud = () => {
             userService.update(user)
                 .then((response) => {
                     setUserDialog(false);
+                    setUserLoaded(false);
                     setUser(emptyUser);
-                    //setUsers([]);
-                    toast.current.show({
+                    setUsers([]);
+                    toast.current?.show({
                         severity: 'info',
                         summary: 'Success',
                         detail: 'User changed successfull'
@@ -113,7 +110,7 @@ const Crud = () => {
                 })
                 .catch((error) => {
                     console.log(error);
-                    toast.current.show({
+                    toast.current?.show({
                         severity: 'error',
                         summary: 'Error',
                         detail: 'Change error: ' + error.message
@@ -133,48 +130,29 @@ const Crud = () => {
     };
 
     const deleteUser = () => {
-        userService.delete(user.id)
-            .then((response) => {
-                setUser(emptyUser);
-                setDeleteUserDialog(false);
-                setUserLoaded(false);
-                setUsers([]);
-                toast.current?.show({
-                    severity: 'success',
-                    summary: 'Successful!',
-                    detail: 'User Deleted',
-                    life: 3000
-                });
-            }).catch((error) => {
-                toast.current?.show({
-                    severity: 'error',
-                    summary: 'Error!',
-                    detail: 'Error to delete user',
-                    life: 3000
-                });
-            })
+        if (user.id) {
+            userService.delete(user.id)
+                .then((response) => {
+                    setUser(emptyUser);
+                    setDeleteUserDialog(false);
+                    setUserLoaded(false);
+                    setUsers([]);
+                    toast.current?.show({
+                        severity: 'success',
+                        summary: 'Successful!',
+                        detail: 'User Deleted',
+                        life: 3000
+                    });
+                }).catch((error) => {
+                    toast.current?.show({
+                        severity: 'error',
+                        summary: 'Error!',
+                        detail: 'Error to delete user',
+                        life: 3000
+                    });
+                })
+        }
     };
-
-    // const findIndexById = (id: string) => {
-    //     let index = -1;
-    //     for (let i = 0; i < (products as any)?.length; i++) {
-    //         if ((products as any)[i].id === id) {
-    //             index = i;
-    //             break;
-    //         }
-    //     }
-
-    //     return index;
-    // };
-
-    // const createId = () => {
-    //     let id = '';
-    //     let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    //     for (let i = 0; i < 5; i++) {
-    //         id += chars.charAt(Math.floor(Math.random() * chars.length));
-    //     }
-    //     return id;
-    // };
 
     const exportCSV = () => {
         dt.current?.exportCSV();
@@ -185,23 +163,35 @@ const Crud = () => {
     };
 
     const deleteSelectedUsers = () => {
-        // let _products = (products as any)?.filter((val: any) => !(selectedProducts as any)?.includes(val));
-        // setProducts(_products);
-        // setDeleteProductsDialog(false);
-        // setSelectedProducts(null);
-        // toast.current?.show({
-        //     severity: 'success',
-        //     summary: 'Successful',
-        //     detail: 'Products Deleted',
-        //     life: 3000
-        // });
+
+        Promise.all(
+            selectedUsers.map(async (_user) => {
+                if(_user.id) {
+                    await userService.delete(_user.id);
+                }
+            })
+        ).then((response) => {
+            setUsers([]);
+            setSelectedUsers([]);
+            setDeleteUsersDialog(false);
+            setUserLoaded(false);
+            toast.current?.show({
+                severity: 'success',
+                summary: 'Successful!',
+                detail: 'Users Deleted',
+                life: 3000
+            })
+        }).catch((error) => {
+            toast.current?.show({
+                severity: 'error',
+                summary: 'Error!',
+                detail: 'Error to delete users',
+                life: 3000
+            });
+        })
+
     };
 
-    // const onCategoryChange = (e: RadioButtonChangeEvent) => {
-    //     let _product = { ...product };
-    //     _product['category'] = e.value;
-    //     setProduct(_product);
-    // };
 
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, name: string) => {
         const val = (e.target && e.target.value) || '';
@@ -210,14 +200,6 @@ const Crud = () => {
 
         setUser(_user);
     };
-
-    // const onInputNumberChange = (e: InputNumberValueChangeEvent, name: string) => {
-    //     const val = e.value || 0;
-    //     let _product = { ...product };
-    //     _product[`${name}`] = val;
-
-    //     setProduct(_product);
-    // };
 
     const leftToolbarTemplate = () => {
         return (
@@ -421,7 +403,7 @@ const Crud = () => {
                     <Dialog visible={deleteUsersDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteUsersDialogFooter} onHide={hideDeleteUsersDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {user && <span>Are you sure you want to delete the selected products?</span>}
+                            {user && <span>Are you sure you want to delete the selected users?</span>}
                         </div>
                     </Dialog>
                 </div>
