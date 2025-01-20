@@ -1,10 +1,10 @@
 import { BaseService } from "./BaseService";
 
 
-export class UserService extends BaseService{
+export class ResourceService extends BaseService{
 
     constructor() {
-        super("/user");
+        super("/resource");
     }
     
 }

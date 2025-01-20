@@ -3,7 +3,7 @@ import axios from "axios";
 
 
 export const axiosInstance = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_BACKEND_URL_API;
+    baseURL: process.env.NEXT_PUBLIC_BACKEND_URL_API
 })
 
 export class BaseService {
@@ -15,6 +15,7 @@ export class BaseService {
     }
 
     listAll() {
+        console.log("chamando url: " + this.url);
         return axiosInstance.get(this.url);
     }
 

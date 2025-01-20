@@ -8,4 +8,10 @@ declare namespace Project {
         email: string;
     };
 
+    type Resource = {
+        id?: number;
+        name: string;
+        key: string;
+    };
+
 }

@@ -11,79 +11,77 @@ import { Toolbar } from 'primereact/toolbar';
 import { classNames } from 'primereact/utils';
 import React, { useEffect, useRef, useState } from 'react';
 import { Project } from '@/types';
-import { UserService } from '@/service/UserService';
+import { ResourceService } from '@/service/ResourceService';
 
 /* @todo Used 'as any' for types here. Will fix in next version due to onSelectionChange event type issue. */
-const User = () => {
-    let emptyUser: Project.User = {
-        id: 0,
+const Resource = () => {
+    let emptyResource: Project.Resource = {
+        id: undefined,
         name: '',
-        password: '',
-        email: '',
-        login: ''
+        key: ''
     };
 
-    const [users, setUsers] = useState<Project.User[]>([]);
-    const [userDialog, setUserDialog] = useState(false);
-    const [deleteUserDialog, setDeleteUserDialog] = useState(false);
-    const [deleteUsersDialog, setDeleteUsersDialog] = useState(false);
-    const [user, setUser] = useState<Project.User>(emptyUser);
-    const [selectedUsers, setSelectedUsers] = useState<Project.User[]>([]);
+    const [resources, setResources] = useState<Project.Resource[]>([]);
+    const [resourceDialog, setResourceDialog] = useState(false);
+    const [deleteResourceDialog, setDeleteResourceDialog] = useState(false);
+    const [deleteResourcesDialog, setDeleteResourcesDialog] = useState(false);
+    const [resource, setResource] = useState<Project.Resource>(emptyResource);
+    const [selectedResources, setSelectedResources] = useState<Project.Resource[]>([]);
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState('');
-    const [userLoaded, setUserLoaded] = useState(false);
+    const [resourceLoaded, setResourceLoaded] = useState(false);
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<any>>(null);
-    const userService = new UserService();
+    const resourceService = new ResourceService();
 
     useEffect(() => {
-        if (!userLoaded && users.length == 0) {
-            userService.listAll()
+        if (!resourceLoaded && resources.length == 0) {
+            resourceService.listAll()
                 .then((response) => {
-                    console.log(response.data);
-                    setUsers(response.data);
-                    setUserLoaded(true);
+                    //console.log(response.data);
+                    setResources(response.data);
+                    setResourceLoaded(true);
                 })
                 .catch((error) => {
                     console.log(error);
                 });
         }
 
-    }, [userService, users]);
+    }, [resourceService, resources]);
 
     const openNew = () => {
-        setUser(emptyUser);
+        setResource(emptyResource);
         setSubmitted(false);
-        setUserDialog(true);
+        setResourceDialog(true);
     };
 
     const hideDialog = () => {
         setSubmitted(false);
-        setUserDialog(false);
+        setResourceDialog(false);
     };
 
-    const hideDeleteUserDialog = () => {
-        setDeleteUserDialog(false);
+    const hideDeleteResourceDialog = () => {
+        setDeleteResourceDialog(false);
     };
 
-    const hideDeleteUsersDialog = () => {
-        setDeleteUsersDialog(false);
+    const hideDeleteResourcesDialog = () => {
+        setDeleteResourcesDialog(false);
     };
 
-    const saveUser = () => {
+    const saveResource = () => {
         setSubmitted(true);
 
-        if (!user.id) {
-            userService.create(user)
+        if (!resource.id) {
+            resourceService.create(resource)
                 .then((response) => {
-                    setUserDialog(false);
-                    setUserLoaded(false);
-                    setUser(emptyUser);
-                    setUsers([]);
+                    setResourceDialog(false);
+                    setResourceLoaded(false);
+                    setResource(emptyResource);
+                    setResources([]);
                     toast.current?.show({
                         severity: 'info',
                         summary: 'Success',
-                        detail: 'User registered successfull'
+                        detail: 'Resource registered successfull'
                     });
                 })
                 .catch((error) => {
@@ -95,17 +93,16 @@ const User = () => {
                     });
                 })
         } else {
-            console.log("Chamando update com o usuário:", user);
-            userService.update(user)
+            resourceService.update(resource)
                 .then((response) => {
-                    setUserDialog(false);
-                    setUserLoaded(false);
-                    setUser(emptyUser);
-                    setUsers([]);
+                    setResourceDialog(false);
+                    setResourceLoaded(false);
+                    setResource(emptyResource);
+                    setResources([]);
                     toast.current?.show({
                         severity: 'info',
                         summary: 'Success',
-                        detail: 'User changed successfull'
+                        detail: 'Resource changed successfull'
                     });
                 })
                 .catch((error) => {
@@ -119,35 +116,35 @@ const User = () => {
         }
     };
 
-    const editUser = (user: Project.User) => {
-        setUser({ ...user });
-        setUserDialog(true);
+    const editResource = (resource: Project.Resource) => {
+        setResource({ ...resource });
+        setResourceDialog(true);
     };
 
-    const confirmDeleteUser = (user: Project.User) => {
-        setUser(user);
-        setDeleteUserDialog(true);
+    const confirmDeleteResource = (resource: Project.Resource) => {
+        setResource(resource);
+        setDeleteResourceDialog(true);
     };
 
-    const deleteUser = () => {
-        if (user.id) {
-            userService.delete(user.id)
+    const deleteResource = () => {
+        if (resource.id) {
+            resourceService.delete(resource.id)
                 .then((response) => {
-                    setUser(emptyUser);
-                    setDeleteUserDialog(false);
-                    setUserLoaded(false);
-                    setUsers([]);
+                    setResource(emptyResource);
+                    setDeleteResourceDialog(false);
+                    setResourceLoaded(false);
+                    setResources([]);
                     toast.current?.show({
                         severity: 'success',
                         summary: 'Successful!',
-                        detail: 'User Deleted',
+                        detail: 'Resource Deleted',
                         life: 3000
                     });
                 }).catch((error) => {
                     toast.current?.show({
                         severity: 'error',
                         summary: 'Error!',
-                        detail: 'Error to delete user',
+                        detail: 'Error to delete resource',
                         life: 3000
                     });
                 })
@@ -159,33 +156,33 @@ const User = () => {
     };
 
     const confirmDeleteSelected = () => {
-        setDeleteUsersDialog(true);
+        setDeleteResourcesDialog(true);
     };
 
-    const deleteSelectedUsers = () => {
+    const deleteSelectedResources = () => {
 
         Promise.all(
-            selectedUsers.map(async (_user) => {
-                if(_user.id) {
-                    await userService.delete(_user.id);
+            selectedResources.map(async (_resources) => {
+                if(_resources.id) {
+                    await resourceService.delete(_resources.id);
                 }
             })
         ).then((response) => {
-            setUsers([]);
-            setSelectedUsers([]);
-            setDeleteUsersDialog(false);
-            setUserLoaded(false);
+            setResources([]);
+            setSelectedResources([]);
+            setDeleteResourcesDialog(false);
+            setResourceLoaded(false);
             toast.current?.show({
                 severity: 'success',
                 summary: 'Successful!',
-                detail: 'Users Deleted',
+                detail: 'Resources Deleted',
                 life: 3000
             })
         }).catch((error) => {
             toast.current?.show({
                 severity: 'error',
                 summary: 'Error!',
-                detail: 'Error to delete users',
+                detail: 'Error to delete resources',
                 life: 3000
             });
         })
@@ -195,10 +192,10 @@ const User = () => {
 
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, name: string) => {
         const val = (e.target && e.target.value) || '';
-        let _user = { ...user };
-        _user[`${name}`] = val;
+        let _resource = { ...resource };
+        _resource[`${name}`] = val;
 
-        setUser(_user);
+        setResource(_resource);
     };
 
     const leftToolbarTemplate = () => {
@@ -206,7 +203,7 @@ const User = () => {
             <React.Fragment>
                 <div className="my-2">
                     <Button label="New" icon="pi pi-plus" severity="success" className=" mr-2" onClick={openNew} />
-                    <Button label="Delete" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedUsers || !(selectedUsers as any).length} />
+                    <Button label="Delete" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedResources || !(selectedResources as any).length} />
                 </div>
             </React.Fragment>
         );
@@ -221,7 +218,7 @@ const User = () => {
         );
     };
 
-    const idBodyTemplate = (rowData: Project.User) => {
+    const idBodyTemplate = (rowData: Project.Resource) => {
         return (
             <>
                 <span className="p-column-title">Id</span>
@@ -230,7 +227,7 @@ const User = () => {
         );
     };
 
-    const nameBodyTemplate = (rowData: Project.User) => {
+    const nameBodyTemplate = (rowData: Project.Resource) => {
         return (
             <>
                 <span className="p-column-title">Name</span>
@@ -239,36 +236,27 @@ const User = () => {
         );
     };
 
-    const loginBodyTemplate = (rowData: Project.User) => {
-        return (
-            <>
-                <span className="p-column-title">Login</span>
-                {rowData.login}
-            </>
-        );
-    };
-
-    const emailBodyTemplate = (rowData: Project.User) => {
+    const keyBodyTemplate = (rowData: Project.Resource) => {
         return (
             <>
                 <span className="p-column-title">E-mail</span>
-                {rowData.email}
+                {rowData.key}
             </>
         );
     };
 
-    const actionBodyTemplate = (rowData: Project.User) => {
+    const actionBodyTemplate = (rowData: Project.Resource) => {
         return (
             <>
-                <Button icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={() => editUser(rowData)} />
-                <Button icon="pi pi-trash" rounded severity="warning" onClick={() => confirmDeleteUser(rowData)} />
+                <Button icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={() => editResource(rowData)} />
+                <Button icon="pi pi-trash" rounded severity="warning" onClick={() => confirmDeleteResource(rowData)} />
             </>
         );
     };
 
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-            <h5 className="m-0">Manage Users</h5>
+            <h5 className="m-0">Manage Resources</h5>
             <span className="block mt-2 md:mt-0 p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText type="search" onInput={(e) => setGlobalFilter(e.currentTarget.value)} placeholder="Search..." />
@@ -276,22 +264,22 @@ const User = () => {
         </div>
     );
 
-    const userDialogFooter = (
+    const resourceDialogFooter = (
         <>
             <Button label="Cancel" icon="pi pi-times" text onClick={hideDialog} />
-            <Button label="Save" icon="pi pi-check" text onClick={saveUser} />
+            <Button label="Save" icon="pi pi-check" text onClick={saveResource} />
         </>
     );
-    const deleteUserDialogFooter = (
+    const deleteResourceDialogFooter = (
         <>
-            <Button label="No" icon="pi pi-times" text onClick={hideDeleteUserDialog} />
-            <Button label="Yes" icon="pi pi-check" text onClick={deleteUser} />
+            <Button label="No" icon="pi pi-times" text onClick={hideDeleteResourceDialog} />
+            <Button label="Yes" icon="pi pi-check" text onClick={deleteResource} />
         </>
     );
-    const deleteUsersDialogFooter = (
+    const deleteResourcesDialogFooter = (
         <>
-            <Button label="No" icon="pi pi-times" text onClick={hideDeleteUsersDialog} />
-            <Button label="Yes" icon="pi pi-check" text onClick={deleteSelectedUsers} />
+            <Button label="No" icon="pi pi-times" text onClick={hideDeleteResourcesDialog} />
+            <Button label="Yes" icon="pi pi-check" text onClick={deleteSelectedResources} />
         </>
     );
 
@@ -304,106 +292,75 @@ const User = () => {
 
                     <DataTable
                         ref={dt}
-                        value={users}
-                        selection={selectedUsers}
-                        onSelectionChange={(e) => setSelectedUsers(e.value as any)}
+                        value={resources}
+                        selection={selectedResources}
+                        onSelectionChange={(e) => setSelectedResources(e.value as any)}
                         dataKey="id"
                         paginator
                         rows={10}
                         rowsPerPageOptions={[5, 10, 25]}
                         className="datatable-responsive"
                         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} users"
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} resources"
                         globalFilter={globalFilter}
-                        emptyMessage="No users found."
+                        emptyMessage="No resources found."
                         header={header}
                         responsiveLayout="scroll"
                     >
                         <Column selectionMode="multiple" headerStyle={{ width: '4rem' }}></Column>
                         <Column field="id" header="Id" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="name" header="Name" sortable body={nameBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="login" header="Login" sortable body={loginBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="email" header="Email" sortable body={emailBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="key" header="key" sortable body={keyBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable>
 
-                    <Dialog visible={userDialog} style={{ width: '450px' }} header="User Details" modal className="p-fluid" footer={userDialogFooter} onHide={hideDialog}>
+                    <Dialog visible={resourceDialog} style={{ width: '450px' }} header="Resource Details" modal className="p-fluid" footer={resourceDialogFooter} onHide={hideDialog}>
                         <div className="field">
                             <label htmlFor="name">Name</label>
                             <InputText
                                 id="name"
-                                value={user.name}
+                                value={resource.name}
                                 onChange={(e) => onInputChange(e, 'name')}
                                 required
                                 autoFocus
                                 className={classNames({
-                                    'p-invalid': submitted && !user.name
+                                    'p-invalid': submitted && !resource.name
                                 })}
                             />
-                            {submitted && !user.name && <small className="p-invalid">Name is required.</small>}
+                            {submitted && !resource.name && <small className="p-invalid">Name is required.</small>}
                         </div>
 
                         <div className="field">
-                            <label htmlFor="login">Login</label>
+                            <label htmlFor="key">Key</label>
                             <InputText
-                                id="login"
-                                value={user.login}
-                                onChange={(e) => onInputChange(e, 'login')}
+                                id="key"
+                                value={resource.key}
+                                onChange={(e) => onInputChange(e, 'key')}
                                 required
                                 autoFocus
                                 className={classNames({
-                                    'p-invalid': submitted && !user.login
+                                    'p-invalid': submitted && !resource.key
                                 })}
                             />
-                            {submitted && !user.login && <small className="p-invalid">Login is required.</small>}
-                        </div>
-
-                        <div className="field">
-                            <label htmlFor="password">Password</label>
-                            <InputText
-                                id="password"
-                                value={user.password}
-                                onChange={(e) => onInputChange(e, 'password')}
-                                required
-                                autoFocus
-                                className={classNames({
-                                    'p-invalid': submitted && !user.password
-                                })}
-                            />
-                            {submitted && !user.password && <small className="p-invalid">Password is required.</small>}
-                        </div>
-
-                        <div className="field">
-                            <label htmlFor="email">Email</label>
-                            <InputText
-                                id="email"
-                                value={user.email}
-                                onChange={(e) => onInputChange(e, 'email')}
-                                required
-                                autoFocus
-                                className={classNames({
-                                    'p-invalid': submitted && !user.email
-                                })}
-                            />
-                            {submitted && !user.email && <small className="p-invalid">Email is required.</small>}
+                            {submitted && !resource.key && <small className="p-invalid">Key is required.</small>}
                         </div>
                     </Dialog>
 
-                    <Dialog visible={deleteUserDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteUserDialogFooter} onHide={hideDeleteUserDialog}>
+                    <Dialog visible={deleteResourceDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteResourceDialogFooter} onHide={hideDeleteResourceDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {user && (
+                            {resource && (
                                 <span>
-                                    Are you sure you want to delete <b>{user.name}</b>?
+                                    Are you sure you want to delete <b>{resource.name}</b>?
                                 </span>
                             )}
                         </div>
                     </Dialog>
 
-                    <Dialog visible={deleteUsersDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteUsersDialogFooter} onHide={hideDeleteUsersDialog}>
+                    <Dialog visible={deleteResourcesDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteResourcesDialogFooter} onHide={hideDeleteResourcesDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {user && <span>Are you sure you want to delete the selected users?</span>}
+                            {resource && <span>Are you sure you want to delete the selected resources?</span>}
                         </div>
                     </Dialog>
                 </div>
@@ -412,4 +369,4 @@ const User = () => {
     );
 };
 
-export default User;
+export default Resource;
