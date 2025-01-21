@@ -14,4 +14,8 @@ declare namespace Project {
         key: string;
     };
 
+    type Profile = {
+        id?: number;
+        description: string;
+    };
 }

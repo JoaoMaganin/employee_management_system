@@ -23,7 +23,7 @@ const User = () => {
         login: ''
     };
 
-    const [users, setUsers] = useState<Project.User[]>([]);
+    const [users, setUsers] = useState<Project.User[] | null>(null);
     const [userDialog, setUserDialog] = useState(false);
     const [deleteUserDialog, setDeleteUserDialog] = useState(false);
     const [deleteUsersDialog, setDeleteUsersDialog] = useState(false);
@@ -31,18 +31,16 @@ const User = () => {
     const [selectedUsers, setSelectedUsers] = useState<Project.User[]>([]);
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState('');
-    const [userLoaded, setUserLoaded] = useState(false);
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<any>>(null);
     const userService = new UserService();
 
     useEffect(() => {
-        if (!userLoaded && users.length == 0) {
+        if (!users) {
             userService.listAll()
                 .then((response) => {
                     console.log(response.data);
                     setUsers(response.data);
-                    setUserLoaded(true);
                 })
                 .catch((error) => {
                     console.log(error);
@@ -77,9 +75,8 @@ const User = () => {
             userService.create(user)
                 .then((response) => {
                     setUserDialog(false);
-                    setUserLoaded(false);
                     setUser(emptyUser);
-                    setUsers([]);
+                    setUsers(null);
                     toast.current?.show({
                         severity: 'info',
                         summary: 'Success',
@@ -95,13 +92,11 @@ const User = () => {
                     });
                 })
         } else {
-            console.log("Chamando update com o usuário:", user);
             userService.update(user)
                 .then((response) => {
                     setUserDialog(false);
-                    setUserLoaded(false);
                     setUser(emptyUser);
-                    setUsers([]);
+                    setUsers(null);
                     toast.current?.show({
                         severity: 'info',
                         summary: 'Success',
@@ -135,8 +130,7 @@ const User = () => {
                 .then((response) => {
                     setUser(emptyUser);
                     setDeleteUserDialog(false);
-                    setUserLoaded(false);
-                    setUsers([]);
+                    setUsers(null);
                     toast.current?.show({
                         severity: 'success',
                         summary: 'Successful!',
@@ -171,10 +165,9 @@ const User = () => {
                 }
             })
         ).then((response) => {
-            setUsers([]);
+            setUsers(null);
             setSelectedUsers([]);
             setDeleteUsersDialog(false);
-            setUserLoaded(false);
             toast.current?.show({
                 severity: 'success',
                 summary: 'Successful!',
