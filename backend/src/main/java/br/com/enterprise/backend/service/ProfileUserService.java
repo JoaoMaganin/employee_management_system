@@ -26,7 +26,7 @@ public class ProfileUserService {
 
     public ProfileUserDTO update(ProfileUserDTO profileUserDTO) {
         ProfileUserEntity existingProfileUser = profileUserRepository.findById(profileUserDTO.getId())
-                .orElseThrow(() -> new RuntimeException("User not found")); // Lança exceção se não encontrar o usuário
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         existingProfileUser.setId(profileUserDTO.getId());
 
