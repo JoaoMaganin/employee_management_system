@@ -24,15 +24,9 @@ public class ProfileUserService {
         profileUserRepository.save(resourceEntity);
     }
 
-    public ProfileUserDTO update(ProfileUserDTO profileUserDTO) {
-        ProfileUserEntity existingProfileUser = profileUserRepository.findById(profileUserDTO.getId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        existingProfileUser.setId(profileUserDTO.getId());
-
-        ProfileUserEntity updatedProfileUser = profileUserRepository.save(existingProfileUser);
-
-        return new ProfileUserDTO(updatedProfileUser);
+    public ProfileUserDTO update(ProfileUserDTO profileUser) {
+        ProfileUserEntity profileUserEntity = new ProfileUserEntity(profileUser);
+        return new ProfileUserDTO(profileUserRepository.save(profileUserEntity));
     }
 
     public void delete(Long id) {

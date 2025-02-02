@@ -6,7 +6,7 @@ import org.springframework.beans.BeanUtils;
 import java.util.Objects;
 
 
-public class ProfileDTO {
+public class ProfileDTO{
 
     private Long id;
     private String description;
