@@ -6,4 +6,4 @@ INSERT INTO etp_profile(id, description) VALUES (1, 'Admin');
 INSERT INTO etp_profile(id, description) VALUES (2, 'Manager');
 INSERT INTO etp_profile(id, description) VALUES (3, 'Client');
 
-ALTER SEQUENCE etp_profile_seq RESTART with 2;
+ALTER SEQUENCE etp_profile_seq RESTART with 53;
