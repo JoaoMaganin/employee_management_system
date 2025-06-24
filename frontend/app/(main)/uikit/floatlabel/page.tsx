@@ -50,12 +50,12 @@ const FloatLabelDemo = () => {
     const searchCountry = (event: AutoCompleteCompleteEvent) => {
         const filtered = [];
         const query = event.query;
-        for (let i = 0; i < countries.length; i++) {
-            const country = countries[i];
-            if (country.name.toLowerCase().indexOf(query.toLowerCase()) === 0) {
-                filtered.push(country);
-            }
-        }
+        // for (let i = 0; i < countries.length; i++) {
+        //     const country = countries[i];
+        //     if (country.name.toLowerCase().indexOf(query.toLowerCase()) === 0) {
+        //         filtered.push(country);
+        //     }
+        // }
         setFilteredCountries(filtered);
     };
 

@@ -10,61 +10,61 @@ import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
 import React, { useEffect, useRef, useState } from 'react';
 import { Project } from '@/types';
-import { ProfileUserService } from '@/service/ProfileUserService';
-import { UserService } from '@/service/UserService';
 import { ProfileService } from '@/service/ProfileService';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
+import { ProfileResourceService } from '@/service/ProfileResourceService';
+import { ResourceService } from '@/service/ResourceService';
 
 /* @todo Used 'as any' for types here. Will fix in next version due to onSelectionChange event type issue. */
-const ProfileUser = () => {
-    let emptyProfileUser: Project.ProfileUser = {
+const ProfileResource = () => {
+    let emptyProfileResource: Project.ProfileResource = {
         id: undefined,
         profile: { description: '' },
-        user: { name: '', login: '', password: '', email: '' }
+        resource: { name: '', key: ''}
     };
 
-    const [profilesUser, setProfilesUser] = useState<Project.ProfileUser[] | null>(null);
-    const [profileUserDialog, setProfileUserDialog] = useState(false);
-    const [deleteProfileUserDialog, setDeleteProfileUserDialog] = useState(false);
-    const [deleteProfilesUserDialog, setDeleteProfilesUserDialog] = useState(false);
-    const [profileUser, setProfileUser] = useState<Project.ProfileUser>(emptyProfileUser);
-    const [selectedProfilesUser, setSelectedProfilesUser] = useState<Project.Profile[]>([]);
+    const [profilesResources, setProfilesResources] = useState<Project.ProfileResource[] | null>(null);
+    const [profileResourceDialog, setProfileResourceDialog] = useState(false);
+    const [deleteProfileResourceDialog, setDeleteProfileResourceDialog] = useState(false);
+    const [deleteProfilesResourcesDialog, setDeleteProfilesResourcesDialog] = useState(false);
+    const [profileResource, setProfileResource] = useState<Project.ProfileResource>(emptyProfileResource);
+    const [selectedProfilesResources, setSelectedProfilesResources] = useState<Project.Profile[]>([]);
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState('');
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<any>>(null);
-    const profileUserService = new ProfileUserService();
-    const userService = new UserService();
+    const profileResourceService = new ProfileResourceService();
+    const resourceService = new ResourceService();
     const profileService = new ProfileService();
-    const [users, setUsers] = useState<Project.User[]>([]);
+    const [resources, setResources] = useState<Project.Resource[]>([]);
     const [profiles, setProfiles] = useState<Project.Profile[]>([]);
 
 
     useEffect(() => {
-        if (!profilesUser) {
-            profileUserService.listAll()
+        if (!profilesResources) {
+            profileResourceService.listAll()
                 .then((response) => {
                     console.log(response.data);
-                    setProfilesUser(response.data);
+                    setProfilesResources(response.data);
                 })
                 .catch((error) => {
                     console.log(error);
                 });
         }
 
-    }, [profileUserService, profilesUser]);
+    }, [profileResourceService, profilesResources]);
 
     useEffect(() => {
-        if (profileUserDialog) {
-            userService.listAll().then((response) => {
-                setUsers(response.data);
-                console.log(users);
+        if (profileResourceDialog) {
+            resourceService.listAll().then((response) => {
+                setResources(response.data);
+                console.log(resources);
             }).catch((error) => {
                 console.log(error);
                 toast.current?.show({
                     severity: 'info',
                     summary: 'Error!',
-                    detail: 'Error to load user list'
+                    detail: 'Error to load resource list'
                 })
             })
 
@@ -80,36 +80,36 @@ const ProfileUser = () => {
                 })
             })
         }
-    }, [profileUserDialog])
+    }, [profileResourceDialog])
 
     const openNew = () => {
-        setProfileUser(emptyProfileUser);
+        setProfileResource(emptyProfileResource);
         setSubmitted(false);
-        setProfileUserDialog(true);
+        setProfileResourceDialog(true);
     };
 
     const hideDialog = () => {
         setSubmitted(false);
-        setProfileUserDialog(false);
+        setProfileResourceDialog(false);
     };
 
-    const hideDeleteProfileUserDialog = () => {
-        setDeleteProfileUserDialog(false);
+    const hideDeleteProfileResourceDialog = () => {
+        setDeleteProfileResourceDialog(false);
     };
 
-    const hideDeleteProfilesUserDialog = () => {
-        setDeleteProfilesUserDialog(false);
+    const hideDeleteProfilesResourcesDialog = () => {
+        setDeleteProfilesResourcesDialog(false);
     };
 
-    const saveProfileUser = () => {
+    const saveProfileResource = () => {
         setSubmitted(true);
 
-        if (!profileUser.id) {
-            profileUserService.create(profileUser)
+        if (!profileResource.id) {
+            profileResourceService.create(profileResource)
                 .then((response) => {
-                    setProfileUserDialog(false);
-                    setProfileUser(emptyProfileUser);
-                    setProfilesUser(null);
+                    setProfileResourceDialog(false);
+                    setProfileResource(emptyProfileResource);
+                    setProfilesResources(null);
                     toast.current?.show({
                         severity: 'info',
                         summary: 'Success',
@@ -125,11 +125,11 @@ const ProfileUser = () => {
                     });
                 })
         } else {
-            profileUserService.update(profileUser)
+            profileResourceService.update(profileResource)
                 .then((response) => {
-                    setProfileUserDialog(false);
-                    setProfileUser(emptyProfileUser);
-                    setProfilesUser(null);
+                    setProfileResourceDialog(false);
+                    setProfileResource(emptyProfileResource);
+                    setProfilesResources(null);
                     toast.current?.show({
                         severity: 'info',
                         summary: 'Success',
@@ -147,34 +147,34 @@ const ProfileUser = () => {
         }
     };
 
-    const editProfileUser = (profileUser: Project.ProfileUser) => {
-        setProfileUser({ ...profileUser });
-        setProfileUserDialog(true);
+    const editProfileResource = (profileResource: Project.ProfileResource) => {
+        setProfileResource({ ...profileResource });
+        setProfileResourceDialog(true);
     };
 
-    const confirmDeleteProfileUser = (profileUser: Project.ProfileUser) => {
-        setProfileUser(profileUser);
-        setDeleteProfileUserDialog(true);
+    const confirmDeleteProfileResource = (profileResource: Project.ProfileResource) => {
+        setProfileResource(profileResource);
+        setDeleteProfileResourceDialog(true);
     };
 
-    const deleteProfileUser = () => {
-        if (profileUser.id) {
-            profileUserService.delete(profileUser.id)
+    const deleteProfileResource = () => {
+        if (profileResource.id) {
+            profileResourceService.delete(profileResource.id)
                 .then((response) => {
-                    setProfileUser(emptyProfileUser);
-                    setDeleteProfileUserDialog(false);
-                    setProfilesUser(null);
+                    setProfileResource(emptyProfileResource);
+                    setDeleteProfileResourceDialog(false);
+                    setProfilesResources(null);
                     toast.current?.show({
                         severity: 'success',
                         summary: 'Successful!',
-                        detail: 'Profile User Deleted',
+                        detail: 'Profile Resource Deleted',
                         life: 3000
                     });
                 }).catch((error) => {
                     toast.current?.show({
                         severity: 'error',
                         summary: 'Error!',
-                        detail: 'Error to delete profile user',
+                        detail: 'Error to delete profile resource',
                         life: 3000
                     });
                 })
@@ -186,21 +186,21 @@ const ProfileUser = () => {
     };
 
     const confirmDeleteSelected = () => {
-        setDeleteProfilesUserDialog(true);
+        setDeleteProfilesResourcesDialog(true);
     };
 
-    const deleteSelectedProfilesUser = () => {
+    const deleteSelectedProfilesResources = () => {
 
         Promise.all(
-            selectedProfilesUser.map(async (_profileUser) => {
-                if (_profileUser.id) {
-                    await profileUserService.delete(_profileUser.id);
+            selectedProfilesResources.map(async (_profileResource) => {
+                if (_profileResource.id) {
+                    await profileResourceService.delete(_profileResource.id);
                 }
             })
         ).then((response) => {
-            setProfilesUser(null);
-            setSelectedProfilesUser([]);
-            setDeleteProfilesUserDialog(false);
+            setProfilesResources(null);
+            setSelectedProfilesResources([]);
+            setDeleteProfilesResourcesDialog(false);
             toast.current?.show({
                 severity: 'success',
                 summary: 'Successful!',
@@ -221,10 +221,10 @@ const ProfileUser = () => {
 
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, name: string) => {
         const val = (e.target && e.target.value) || '';
-        let _profileUser = { ...profileUser };
-        _profileUser[`${name}`] = val;
+        let _profileResource = { ...profileResource };
+        _profileResource[`${name}`] = val;
 
-        setProfileUser(_profileUser);
+        setProfileResource(_profileResource);
     };
 
     const leftToolbarTemplate = () => {
@@ -232,7 +232,7 @@ const ProfileUser = () => {
             <React.Fragment>
                 <div className="my-2">
                     <Button label="New" icon="pi pi-plus" severity="success" className=" mr-2" onClick={openNew} />
-                    <Button label="Delete" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedProfilesUser || !(selectedProfilesUser as any).length} />
+                    <Button label="Delete" icon="pi pi-trash" severity="danger" onClick={confirmDeleteSelected} disabled={!selectedProfilesResources || !(selectedProfilesResources as any).length} />
                 </div>
             </React.Fragment>
         );
@@ -247,7 +247,7 @@ const ProfileUser = () => {
         );
     };
 
-    const idBodyTemplate = (rowData: Project.ProfileUser) => {
+    const idBodyTemplate = (rowData: Project.ProfileResource) => {
         return (
             <>
                 <span className="p-column-title">Id</span>
@@ -256,7 +256,7 @@ const ProfileUser = () => {
         );
     };
 
-    const profileBodyTemplate = (rowData: Project.ProfileUser) => {
+    const profileBodyTemplate = (rowData: Project.ProfileResource) => {
         return (
             <>
                 <span className="p-column-title">Profile Description</span>
@@ -265,39 +265,39 @@ const ProfileUser = () => {
         );
     };
 
-    const userBodyTemplate = (rowData: Project.ProfileUser) => {
+    const resourceBodyTemplate = (rowData: Project.ProfileResource) => {
         return (
             <>
                 <span className="p-column-title">Profile Description</span>
-                {rowData.user.name}
+                {rowData.resource.name}
             </>
         );
     };
 
-    const actionBodyTemplate = (rowData: Project.ProfileUser) => {
+    const actionBodyTemplate = (rowData: Project.ProfileResource) => {
         return (
             <>
-                <Button icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={() => editProfileUser(rowData)} />
-                <Button icon="pi pi-trash" rounded severity="warning" onClick={() => confirmDeleteProfileUser(rowData)} />
+                <Button icon="pi pi-pencil" rounded severity="success" className="mr-2" onClick={() => editProfileResource(rowData)} />
+                <Button icon="pi pi-trash" rounded severity="warning" onClick={() => confirmDeleteProfileResource(rowData)} />
             </>
         );
     };
 
     const onSelectProfileChange = (profile: Project.Profile) => {
-        let _profileUser = { ...profileUser };
-        _profileUser.profile = profile;
-        setProfileUser(_profileUser);
+        let _profileResource = { ...profileResource };
+        _profileResource.profile = profile;
+        setProfileResource(_profileResource);
     }
 
-    const onSelectUserChange = (user: Project.User) => {
-        let _profileUser = { ...profileUser };
-        _profileUser.user = user;
-        setProfileUser(_profileUser);
+    const onSelectResourceChange = (resource: Project.Resource) => {
+        let _profileResource = { ...profileResource };
+        _profileResource.resource = resource;
+        setProfileResource(_profileResource);
     }
 
     const header = (
         <div className="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-            <h5 className="m-0">Manage Profile User</h5>
+            <h5 className="m-0">Manage Profile Resource Permissions</h5>
             <span className="block mt-2 md:mt-0 p-input-icon-left">
                 <i className="pi pi-search" />
                 <InputText type="search" onInput={(e) => setGlobalFilter(e.currentTarget.value)} placeholder="Search..." />
@@ -305,22 +305,22 @@ const ProfileUser = () => {
         </div>
     );
 
-    const profileUserDialogFooter = (
+    const profileResourceDialogFooter = (
         <>
             <Button label="Cancel" icon="pi pi-times" text onClick={hideDialog} />
-            <Button label="Save" icon="pi pi-check" text onClick={saveProfileUser} />
+            <Button label="Save" icon="pi pi-check" text onClick={saveProfileResource} />
         </>
     );
-    const deleteProfileUserDialogFooter = (
+    const deleteProfileResourceDialogFooter = (
         <>
-            <Button label="No" icon="pi pi-times" text onClick={hideDeleteProfileUserDialog} />
-            <Button label="Yes" icon="pi pi-check" text onClick={deleteProfileUser} />
+            <Button label="No" icon="pi pi-times" text onClick={hideDeleteProfileResourceDialog} />
+            <Button label="Yes" icon="pi pi-check" text onClick={deleteProfileResource} />
         </>
     );
-    const deleteProfilesUserDialogFooter = (
+    const deleteProfilesResourcesDialogFooter = (
         <>
-            <Button label="No" icon="pi pi-times" text onClick={hideDeleteProfilesUserDialog} />
-            <Button label="Yes" icon="pi pi-check" text onClick={deleteSelectedProfilesUser} />
+            <Button label="No" icon="pi pi-times" text onClick={hideDeleteProfilesResourcesDialog} />
+            <Button label="Yes" icon="pi pi-check" text onClick={deleteSelectedProfilesResources} />
         </>
     );
 
@@ -333,9 +333,9 @@ const ProfileUser = () => {
 
                     <DataTable
                         ref={dt}
-                        value={profilesUser}
-                        selection={selectedProfilesUser}
-                        onSelectionChange={(e) => setSelectedProfilesUser(e.value as any)}
+                        value={profilesResources}
+                        selection={selectedProfilesResources}
+                        onSelectionChange={(e) => setSelectedProfilesResources(e.value as any)}
                         dataKey="id"
                         paginator
                         rows={10}
@@ -351,47 +351,47 @@ const ProfileUser = () => {
                         <Column selectionMode="multiple" headerStyle={{ width: '4rem' }}></Column>
                         <Column field="id" header="Id" sortable body={idBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column field="profile" header="Profile" sortable body={profileBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
-                        <Column field="user" header="User" sortable body={userBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
+                        <Column field="resource" header="Resource" sortable body={resourceBodyTemplate} headerStyle={{ minWidth: '15rem' }}></Column>
                         <Column body={actionBodyTemplate} headerStyle={{ minWidth: '10rem' }}></Column>
                     </DataTable>
 
-                    <Dialog visible={profileUserDialog} style={{ width: '450px' }} header="Profile Details" modal className="p-fluid" footer={profileUserDialogFooter} onHide={hideDialog}>
+                    <Dialog visible={profileResourceDialog} style={{ width: '450px' }} header="Profile Details" modal className="p-fluid" footer={profileResourceDialogFooter} onHide={hideDialog}>
                         <div className="field">
                             <label htmlFor="description">Profile</label>
                             <Dropdown
-                                optionLabel='description' value={profileUser.profile} options={profiles} filter
+                                optionLabel='description' value={profileResource.profile} options={profiles} filter
                                 onChange={(e: DropdownChangeEvent) => onSelectProfileChange(e.value)} placeholder='Select a profile...'
                             >
                             </Dropdown>
-                            {submitted && !profileUser.profile && <small className="p-invalid">Profile is required.</small>}
+                            {submitted && !profileResource.profile && <small className="p-invalid">Profile is required.</small>}
                         </div>
 
                         <div className="field">
-                            <label htmlFor="description">User</label>
+                            <label htmlFor="description">Resource</label>
                             <Dropdown
-                                optionLabel='name' value={profileUser.user} options={users} filter
-                                onChange={(e: DropdownChangeEvent) => onSelectUserChange(e.value)} placeholder='Select a user...'
+                                optionLabel='name' value={profileResource.resource} options={resources} filter
+                                onChange={(e: DropdownChangeEvent) => onSelectResourceChange(e.value)} placeholder='Select a resource...'
                             >
                             </Dropdown>
-                            {submitted && !profileUser.user && <small className="p-invalid">User is required.</small>}
+                            {submitted && !profileResource.resource && <small className="p-invalid">Resource is required.</small>}
                         </div>
                     </Dialog>
 
-                    <Dialog visible={deleteProfileUserDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileUserDialogFooter} onHide={hideDeleteProfileUserDialog}>
+                    <Dialog visible={deleteProfileResourceDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfileResourceDialogFooter} onHide={hideDeleteProfileResourceDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {profileUser && (
+                            {profileResource && (
                                 <span>
-                                    Are you sure you want to delete <b>{profileUser.profile.description}</b>?
+                                    Are you sure you want to delete <b>{profileResource.profile.description}</b>?
                                 </span>
                             )}
                         </div>
                     </Dialog>
 
-                    <Dialog visible={deleteProfilesUserDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfilesUserDialogFooter} onHide={hideDeleteProfilesUserDialog}>
+                    <Dialog visible={deleteProfilesResourcesDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProfilesResourcesDialogFooter} onHide={hideDeleteProfilesResourcesDialog}>
                         <div className="flex align-items-center justify-content-center">
                             <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem' }} />
-                            {profileUser && <span>Are you sure you want to delete the selected profiles?</span>}
+                            {profileResource && <span>Are you sure you want to delete the selected profiles?</span>}
                         </div>
                     </Dialog>
                 </div>
@@ -400,4 +400,4 @@ const ProfileUser = () => {
     );
 };
 
-export default ProfileUser;
+export default ProfileResource;

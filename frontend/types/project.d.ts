@@ -24,4 +24,10 @@ declare namespace Project {
         profile: Profile,
         user: User;
     };
+
+    type ProfileResource = {
+        id?: number;
+        profile: Profile;
+        resource: Resource;
+    }
 }
