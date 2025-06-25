@@ -16,7 +16,7 @@ import { UserService } from '@/service/UserService';
 /* @todo Used 'as any' for types here. Will fix in next version due to onSelectionChange event type issue. */
 const User = () => {
     let emptyUser: Project.User = {
-        id: 0,
+        id: null,
         name: '',
         password: '',
         email: '',

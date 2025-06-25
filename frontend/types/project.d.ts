@@ -1,7 +1,7 @@
 declare namespace Project {
 
     type User = {
-        id?: number;
+        id?: number | null;
         name: string;
         login: string;
         password: string;
