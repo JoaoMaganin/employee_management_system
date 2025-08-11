@@ -9,6 +9,7 @@ in addition to implementing different functions for different users using roles.
 * RESTful API Design: Implementation of a stateless architecture for endpoints, with data exchange via JSON, ensuring interoperability and scalability.
 * TypeScrpit with NextJS: The frontend of this application was built with Next.js, taking advantage of its Server-Side Rendering (SSR) performance optimization features, and using TypeScript for greater robustness and code maintainability.
 * React Hooks: managing state and logic of components efficiently and functionally
+* JWT Authentication: method for securely transmitting information between parties as a digitally signed JSON object
 
 # API Endpoints
 
