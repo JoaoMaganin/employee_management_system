@@ -10,6 +10,7 @@ in addition to implementing different functions for different users using roles.
 * TypeScrpit with NextJS: The frontend of this application was built with Next.js, taking advantage of its Server-Side Rendering (SSR) performance optimization features, and using TypeScript for greater robustness and code maintainability.
 * React Hooks: managing state and logic of components efficiently and functionally
 * JWT Authentication: method for securely transmitting information between parties as a digitally signed JSON object
+* Email verification using enums and uuid
 
 # API Endpoints
 
