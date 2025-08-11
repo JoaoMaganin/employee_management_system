@@ -1,6 +1,7 @@
 package br.com.enterprise.backend.dto;
 
 import br.com.enterprise.backend.entity.UserEntity;
+import br.com.enterprise.backend.entity.enums.UserStatusType;
 import org.springframework.beans.BeanUtils;
 
 public class UserDTO {
@@ -10,6 +11,7 @@ public class UserDTO {
     private String login;
     private String password;
     private String email;
+    private UserStatusType status;
 
     public UserDTO(UserEntity user) {
         BeanUtils.copyProperties(user, this);
@@ -57,5 +59,13 @@ public class UserDTO {
 
     public void setId(Long id) {
         Id = id;
+    }
+
+    public UserStatusType getStatus() {
+        return status;
+    }
+
+    public void setStatus(UserStatusType status) {
+        this.status = status;
     }
 }

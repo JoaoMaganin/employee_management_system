@@ -1,9 +1,8 @@
 package br.com.enterprise.backend.entity;
 
 import br.com.enterprise.backend.dto.UserDTO;
+import br.com.enterprise.backend.entity.enums.UserStatusType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 
 import java.util.Objects;
@@ -27,6 +26,10 @@ public class UserEntity {
 
     @Column(nullable = false)
     private String email;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserStatusType status;
 
     public UserEntity(UserDTO user) {
         BeanUtils.copyProperties(user, this);
@@ -74,6 +77,14 @@ public class UserEntity {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public UserStatusType getStatus() {
+        return status;
+    }
+
+    public void setStatus(UserStatusType status) {
+        this.status = status;
     }
 
     @Override
