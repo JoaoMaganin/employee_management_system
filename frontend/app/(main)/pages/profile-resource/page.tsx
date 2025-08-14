@@ -8,7 +8,7 @@ import { FileUpload } from 'primereact/fileupload';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Project } from '@/types';
 import { ProfileService } from '@/service/ProfileService';
 import { Dropdown, DropdownChangeEvent } from 'primereact/dropdown';
@@ -33,9 +33,9 @@ const ProfileResource = () => {
     const [globalFilter, setGlobalFilter] = useState('');
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<any>>(null);
-    const profileResourceService = new ProfileResourceService();
-    const resourceService = new ResourceService();
-    const profileService = new ProfileService();
+    const profileResourceService = useMemo(() => new ProfileResourceService(), []);
+    const resourceService = useMemo(() => new ResourceService(), []);
+    const profileService = useMemo(() => new ProfileService(), []);
     const [resources, setResources] = useState<Project.Resource[]>([]);
     const [profiles, setProfiles] = useState<Project.Profile[]>([]);
 
@@ -80,7 +80,7 @@ const ProfileResource = () => {
                 })
             })
         }
-    }, [profileResourceDialog])
+    }, [profileResourceDialog, profileService, profiles, resourceService, resources])
 
     const openNew = () => {
         setProfileResource(emptyProfileResource);

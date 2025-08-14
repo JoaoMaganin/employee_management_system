@@ -8,7 +8,7 @@ import { FileUpload } from 'primereact/fileupload';
 import { InputText } from 'primereact/inputtext';
 import { Toast } from 'primereact/toast';
 import { Toolbar } from 'primereact/toolbar';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Project } from '@/types';
 import { ProfileUserService } from '@/service/ProfileUserService';
 import { UserService } from '@/service/UserService';
@@ -33,9 +33,9 @@ const ProfileUser = () => {
     const [globalFilter, setGlobalFilter] = useState('');
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable<any>>(null);
-    const profileUserService = new ProfileUserService();
-    const userService = new UserService();
-    const profileService = new ProfileService();
+    const profileUserService = useMemo(() => new ProfileUserService(), []);
+    const userService = useMemo(() => new UserService(), []);
+    const profileService = useMemo(() => new ProfileService(), []);
     const [users, setUsers] = useState<Project.User[]>([]);
     const [profiles, setProfiles] = useState<Project.Profile[]>([]);
 
@@ -80,7 +80,7 @@ const ProfileUser = () => {
                 })
             })
         }
-    }, [profileUserDialog])
+    }, [profileUserDialog, profileService, profiles, userService, users])
 
     const openNew = () => {
         setProfileUser(emptyProfileUser);
