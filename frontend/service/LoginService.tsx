@@ -9,4 +9,11 @@ export class LoginService {
     newUser(user: Project.User) {
         return axiosInstance.post('/auth/newUser', user);
     }
+
+    login(login: String, password: String) {
+        return axiosInstance.post('/auth/login', {
+            username: login,
+            password: password
+        });
+    }
 }
