@@ -28,6 +28,7 @@ const LoginPage = () => {
             localStorage.setItem('TOKEN_FRONTEND_APP', response.data.token);
 
             router.push('/');
+            window.location.reload();
         }).catch(() => {
             toast.current?.show({
                 severity: 'error',
